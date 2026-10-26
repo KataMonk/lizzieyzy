@@ -3452,14 +3452,11 @@ public class ConfigDialog2 extends JDialog {
             || theme.winrateFontName().equals("Lizzie Default")) {
           try {
             LizzieFrame.winrateFont =
-                Font.createFont(
-                    Font.TRUETYPE_FONT,
-                    Thread.currentThread()
-                        .getContextClassLoader()
-                        .getResourceAsStream("fonts/OpenSans-Semibold.ttf"));
-          } catch (IOException | FontFormatException e) {
-            e.printStackTrace();
+                featurecat.lizzie.util.Utils.loadFontResource("fonts/OpenSans-Semibold.ttf");
+          } catch (Throwable ignore) {
           }
+          if (LizzieFrame.winrateFont == null)
+            LizzieFrame.winrateFont = new Font("SansSerif", Font.BOLD, 12);
         } else if (theme.winrateFontName() != null) {
           LizzieFrame.winrateFont = new Font(theme.winrateFontName(), Font.PLAIN, 12);
         }
@@ -3665,14 +3662,11 @@ public class ConfigDialog2 extends JDialog {
             || Lizzie.config.uiConfig.getString("winrate-font-name").equals("Lizzie Default"))) {
       try {
         LizzieFrame.winrateFont =
-            Font.createFont(
-                Font.TRUETYPE_FONT,
-                Thread.currentThread()
-                    .getContextClassLoader()
-                    .getResourceAsStream("fonts/OpenSans-Semibold.ttf"));
-      } catch (IOException | FontFormatException e) {
-        e.printStackTrace();
+            featurecat.lizzie.util.Utils.loadFontResource("fonts/OpenSans-Semibold.ttf");
+      } catch (Throwable ignore) {
       }
+      if (LizzieFrame.winrateFont == null)
+        LizzieFrame.winrateFont = new Font("SansSerif", Font.BOLD, 12);
     } else if (!Lizzie.config.uiConfig.optString("winrate-font-name").isEmpty()) {
       LizzieFrame.winrateFont =
           new Font(Lizzie.config.uiConfig.optString("winrate-font-name"), Font.PLAIN, 12);

@@ -62,16 +62,13 @@ public class GtpConsolePane extends JDialog {
     super(owner);
     setTitle(resourceBundle.getString("GtpConsolePane.title"));
     try {
-      gtpFont =
-          Font.createFont(
-              Font.TRUETYPE_FONT,
-              Thread.currentThread()
-                  .getContextClassLoader()
-                  .getResourceAsStream("fonts/SourceCodePro-Regular.ttf"));
-
-      gtpFont = gtpFont.deriveFont(Font.PLAIN, Config.frameFontSize);
-    } catch (IOException | FontFormatException e) {
-      e.printStackTrace();
+      Font custom = featurecat.lizzie.util.Utils.loadFontResource("fonts/SourceCodePro-Regular.ttf");
+      if (custom != null) {
+        gtpFont = custom.deriveFont(Font.PLAIN, Config.frameFontSize);
+      } else {
+        gtpFont = new Font(Font.MONOSPACED, Font.PLAIN, Config.frameFontSize);
+      }
+    } catch (Throwable e) {
       gtpFont = new Font(Font.MONOSPACED, Font.PLAIN, Config.frameFontSize);
     }
     docQueue = new ArrayDeque<>();

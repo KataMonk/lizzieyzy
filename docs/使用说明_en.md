@@ -66,8 +66,20 @@ Highlights:
 | `kata1-tf3-b11c768-...bin.gz` | main analysis (candidates/winrate) | ~250 MB |
 | `kata1-tf2-b10c384-...bin.gz` | territory estimation (fast) | ~36 MB |
 
-Engine entries: OpenCL b11c768 (default), OpenCL b10c384, TensorRT b11c768, TensorRT b10c384.
-Switch in **Settings → Engine settings**.
+Engine entries (switch in **Settings → Engine settings**; OpenCL is still the default):
+
+| Entry | Backend | Notes |
+|---|---|---|
+| `(OpenCL-官方)Kata1-b11c768-tf3` | OpenCL | **default**, best compatibility |
+| `(OpenCL-官方)Kata1-b10c384-tf2` | OpenCL | |
+| `(ONNX-DirectML)Kata1-b11c768-tf3` | ONNX + DirectML | no CUDA needed (verified to initialize on this machine) |
+| `(ONNX-DirectML)Kata1-b10c384-tf2` | ONNX + DirectML | |
+| `(CUDA-需CUDA12/cuDNN9)…` | CUDA | requires CUDA 12.1 + cuDNN 8.9.7 runtime |
+| `(TensorRT10-需TRT10)…` | TensorRT | requires TensorRT 10.16.1 + CUDA 13.2 runtime |
+| `(TensorRT8-自带库)…` | TensorRT | old KataGo 1.13.1 with bundled DLLs |
+
+> The package includes the ONNX runtime (`katago_onnx\`) and the CUDA/TRT10 executables
+> (`katago_cuda\`, `katago_tensorRT10\`), but their system runtimes must be installed separately.
 
 ---
 
@@ -177,6 +189,8 @@ See `文档\抓包指南.md`.
 | no estimate numbers | wait for engine, open the estimate panel, lower thresholds |
 | a kifu is not found by nickname | casual games are not indexed; paste the share link |
 | lobby says no token | configure `yike-token.txt` (7.4) |
+| Problem reading font data in console | fixed in this build (falls back to loading fonts from a writable temp file) |
+| CUDA/TensorRT10 engine fails | install the matching runtime or switch back to OpenCL / ONNX-DirectML |
 | broken config | delete `config.txt` and restart |
 
 ---
@@ -198,7 +212,9 @@ QQ groups: 584641555 (4), 246284327 (3), 867298807 (2), 786173361 (1)
   - Simplified update dialog (version + QQ groups only);
   - About page: build 20261026, authors yzyray/katamonk, new source URL;
   - Version 2.5.4 everywhere (jar/exe/folder);
-  - Rewritten manual with screenshots.
+  - Rewritten manual with screenshots;
+  - fixed `Problem reading font data` under broken TEMP;
+  - added ONNX-DirectML / CUDA12 / TensorRT10 engine entries (OpenCL remains default).
 - **2.5.3 base (rebuilt from 2023-06 source)**
   - Startup/font/temp/black-screen fixes; estimate calibration; thresholds 0.2/0.5;
   - Fox/Tencent kifu import; Yike live/lobby sync; performance tuning; no embedded secrets.

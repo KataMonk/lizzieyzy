@@ -556,16 +556,11 @@ public class ContributeView extends JFrame {
 
     Font gtpFont;
     try {
-      gtpFont =
-          Font.createFont(
-              Font.TRUETYPE_FONT,
-              Thread.currentThread()
-                  .getContextClassLoader()
-                  .getResourceAsStream("fonts/SourceCodePro-Regular.ttf"));
+      gtpFont = featurecat.lizzie.util.Utils.loadFontResource("fonts/SourceCodePro-Regular.ttf");
+      if (gtpFont == null) gtpFont = new Font(Font.MONOSPACED, Font.PLAIN, Config.frameFontSize);
 
       gtpFont = gtpFont.deriveFont(Font.PLAIN, Config.frameFontSize);
-    } catch (IOException | FontFormatException e) {
-      e.printStackTrace();
+    } catch (Throwable e) {
       gtpFont = new Font(Font.MONOSPACED, Font.PLAIN, Config.frameFontSize);
     }
     console.setFont(gtpFont);

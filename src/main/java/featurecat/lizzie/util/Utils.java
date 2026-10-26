@@ -83,22 +83,68 @@ public class Utils {
     }
   }
 
+  /**
+   * 从 classpath 加载字体。部分环境（JVM 启动时 java.io.tmpdir 不可写）会导致
+   * Font.createFont(InputStream) 失败（"Problem reading font data"）。
+   * 这里先写入可写临时文件再用 File 方式加载，失败则返回 null 由调用方兜底。
+   */
+  public static java.awt.Font loadFontResource(String path) {
+    java.io.InputStream in = null;
+    try {
+      in = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+      if (in == null) return null;
+      byte[] bytes = readAllBytes(in);
+      try {
+        return java.awt.Font.createFont(
+            java.awt.Font.TRUETYPE_FONT, new java.io.ByteArrayInputStream(bytes));
+      } catch (Throwable first) {
+        java.io.File dir = new java.io.File("temp");
+        try {
+          dir.mkdirs();
+        } catch (Throwable ignore) {
+        }
+        java.io.File tmp = null;
+        try {
+          tmp = java.io.File.createTempFile("lizzie-font", ".ttf", dir);
+          java.nio.file.Files.write(tmp.toPath(), bytes);
+          return java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, tmp);
+        } finally {
+          if (tmp != null) tmp.delete();
+        }
+      }
+    } catch (Throwable e) {
+      return null;
+    } finally {
+      if (in != null) {
+        try {
+          in.close();
+        } catch (Throwable ignore) {
+        }
+      }
+    }
+  }
+
+  private static byte[] readAllBytes(java.io.InputStream in) throws java.io.IOException {
+    java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+    byte[] buf = new byte[8192];
+    int n;
+    while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+    return out.toByteArray();
+  }
+
   public static void loadFonts(String uiFontName, String playoutFontName, String winrateFontName) {
     // 先用系统字体兜底，确保任何情况下 winrateFont 等都不为 null
     LizzieFrame.uiFont = new Font("SansSerif", Font.PLAIN, 12);
     LizzieFrame.playoutsFont = new Font("SansSerif", Font.PLAIN, 12);
     LizzieFrame.winrateFont = new Font("SansSerif", Font.BOLD, 12);
     try {
-      LizzieFrame.winrateFont =
-          Font.createFont(
-              Font.TRUETYPE_FONT,
-              Thread.currentThread()
-                  .getContextClassLoader()
-                  .getResourceAsStream("fonts/OpenSans-Semibold.ttf"));
-    } catch (Throwable e) {
-      e.printStackTrace();
+      Font custom = loadFontResource("fonts/OpenSans-Semibold.ttf");
+      if (custom != null) LizzieFrame.winrateFont = custom;
+    } catch (Throwable ignore) {
     }
-    if (LizzieFrame.winrateFont == null) LizzieFrame.winrateFont = new Font("SansSerif", Font.BOLD, 12);
+    if (LizzieFrame.winrateFont == null) {
+      LizzieFrame.winrateFont = new Font("SansSerif", Font.BOLD, 12);
+    }
     if (uiFontName != null
         && (!(uiFontName.equals("Lizzie默认") || uiFontName.equals("Lizzie Default")))) {
       LizzieFrame.uiFont = new Font(uiFontName, Font.PLAIN, 12);
@@ -110,7 +156,6 @@ public class Utils {
       LizzieFrame.winrateFont = new Font(winrateFontName, Font.BOLD, 12);
     }
   }
-
   public static void addStone(
       Stone[] stones,
       Zobrist zobrist,
