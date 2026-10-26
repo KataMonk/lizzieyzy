@@ -1,0 +1,28 @@
+# Maven 构建产物
+target/
+*.class
+*.jar
+
+# 运行期文件（程序自动生成）
+temp/
+persist
+persist.txt
+save/
+clockHelper/
+foxReq/
+estimate-calibrate.txt
+config_wrong.txt
+readboard/debug.log
+*.log
+
+# 本地私有配置（不要提交）
+yike-token.txt
+config-local.txt
+.env
+
+# IDE / 系统
+.idea/
+.vscode/
+.settings/
+.DS_Store
+Thumbs.db
